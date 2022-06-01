@@ -2,6 +2,11 @@ import { ReactWidget } from '@jupyterlab/apputils';
 
 import React, { useState } from 'react';
 
+const addJupyterNotebook = () => {
+  console.log('adding a notebook');
+
+};
+
 /**
  * React component for a counter.
  *
@@ -16,6 +21,7 @@ const CounterComponent = (): JSX.Element => {
       <button
         onClick={(): void => {
           setCounter(counter + 1);
+          addJupyterNotebook();
         }}
       >
         Increment

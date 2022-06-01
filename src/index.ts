@@ -30,7 +30,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     const command = CommandIDs.create;
     commands.addCommand(command, {
-      caption: 'Create a new React Widget',
+      caption: 'Create a new React Widget (Test)',
       label: 'React Widget',
       icon: args => (args['isPalette'] ? undefined : reactIcon),
       execute: () => {

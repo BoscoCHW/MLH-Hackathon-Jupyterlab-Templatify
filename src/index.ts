@@ -4,6 +4,7 @@ import {
 } from '@jupyterlab/application';
 
 import { MainAreaWidget } from '@jupyterlab/apputils';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
@@ -25,7 +26,12 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: 'react-widget',
   autoStart: true,
   optional: [ILauncher],
-  activate: (app: JupyterFrontEnd, launcher: ILauncher) => {
+  requires: [IFileBrowserFactory],
+  activate: (
+    app: JupyterFrontEnd,
+    browser: IFileBrowserFactory,
+    launcher: ILauncher
+  ) => {
     const { commands } = app;
 
     const command = CommandIDs.create;
@@ -34,7 +40,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       label: 'React Widget',
       icon: args => (args['isPalette'] ? undefined : reactIcon),
       execute: () => {
-        const content = new CounterWidget();
+        const content = new CounterWidget(app, browser);
         const widget = new MainAreaWidget<CounterWidget>({ content });
         widget.title.label = 'React Widget';
         widget.title.icon = reactIcon;

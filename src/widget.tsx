@@ -29,6 +29,15 @@ const openNotebook = async (
   });
 };
 
+const notebookSettings = [
+  'Project Description',
+  'Import Data',
+  'Import Libraries',
+  'Null Values'
+];
+
+const dataAnalysisSettings = ['Histogram'];
+
 /**
  * React component for a counter.
  *
@@ -58,15 +67,62 @@ export class CounterWidget extends ReactWidget {
   render(): JSX.Element {
     return (
       <div>
-        <p>Click me to create a Jupyter notebook template!</p>
-        <button
-          onClick={async (): Promise<void> => {
-            const path = await addJupyterNotebook();
-            openNotebook(this.app, path);
-          }}
-        >
-          Go
-        </button>
+        <h1>Templatify</h1>
+        <p>Create a Jupyter notebook template</p>
+        <label>
+          Please select a csv file to proceed.
+          <input type="file" id="filePath" name="filePath" />
+          <h2>Notebook Settings</h2>
+          <ul className="settings-list">
+            {notebookSettings.map((setting, index) => {
+              return (
+                <>
+                  <li key={index}></li>
+                  <div className="notebook-settings-item">
+                    <label>
+                      {setting}
+                      <input
+                        type="checkbox"
+                        id={'checkbox-${index}'}
+                        name={setting}
+                        value={setting}
+                      />
+                    </label>
+                  </div>
+                </>
+              );
+            })}
+          </ul>
+          <h2>Types of Data Analysis</h2>
+          <ul className="settings-list">
+            {dataAnalysisSettings.map((setting, index) => {
+              return (
+                <>
+                  <li key={index}></li>
+                  <div className="notebook-settings-item">
+                    <label>
+                      {setting}
+                      <input
+                        type="checkbox"
+                        id={'checkbox-${index}'}
+                        name={setting}
+                        value={setting}
+                      />
+                    </label>
+                  </div>
+                </>
+              );
+            })}
+          </ul>
+          <button
+            onClick={async (): Promise<void> => {
+              const path = await addJupyterNotebook();
+              openNotebook(this.app, path);
+            }}
+          >
+            Generate
+          </button>
+        </label>
       </div>
     );
   }

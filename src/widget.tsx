@@ -12,6 +12,7 @@ const addJupyterNotebook = async () => {
   const serverResponse = await ServerConnection.makeRequest(
     URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
     { method: 'GET' },
+    // {method: 'POST', body: JSON.stringify()}
     settings
   );
   const data = await serverResponse.json();
@@ -61,14 +62,15 @@ export class CounterWidget extends ReactWidget {
     super();
     this.app = app;
     this.browser = browser;
-    this.addClass('jp-ReactWidget');
+    this.addClass('jp-Templatify');
   }
 
   render(): JSX.Element {
     return (
-      <div>
+      <div className="templatify-body">
         <h1>Templatify</h1>
         <p>Create a Jupyter notebook template</p>
+        <br />
         <label>
           Please select a csv file to proceed.
           <input type="file" id="filePath" name="filePath" />

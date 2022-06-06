@@ -4,7 +4,7 @@ import { URLExt } from '@jupyterlab/coreutils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ServerConnection } from '@jupyterlab/services';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 const addJupyterNotebook = async () => {
   console.log('processing');
@@ -45,23 +45,58 @@ const dataAnalysisSettings = [
 
 const initialFormData = Object.freeze({
   filePath: '',
-  'Project Description': '',
-  'Import Data': '',
-  'Import Libraries': '',
-  'Null Values': '',
-  Histogram: '',
-  ScatterPlots: '',
-  'Feature to Feature Correlation Matrix': ''
+  preliminary: {
+    projectDescription: false,
+    importLibraries: false,
+    importData: false,
+    columnsToDrop: '',
+    nullValues: false
+  },
+  descriptiveStat: {
+    histograms: false,
+    scatterPlots: {
+      selected: false,
+      targetVar: ''
+    },
+    featureToFeatureCorr: {
+      selected: false,
+      targetVar: ''
+    }
+  }
 });
 
+const handleTextFormat = (text: {
+  target: { name: { split: () => string[] } };
+}) => {
+  const formattedText = text.target.name
+    .split()
+    .map(
+      (word: string) =>
+        word.charAt(0).toLowerCase() + word.substring(1) + word.trim()
+    )
+    .join('');
+  return formattedText;
+};
+
 const Form = () => {
-  const [formData, updateFormData] = React.useState(initialFormData);
+  const [formData, setFormData] = useState(initialFormData);
+
+  // const handlePreliminary = () => {
+  //   const preliminarySettings = { ...formData.preliminary };
+
+  // };
 
   const handleChange = (e: any) => {
-    console.log(e);
-    updateFormData({
+    const text = handleTextFormat(e);
+    let result;
+    if (e.target.value !== false) {
+      result = true;
+    } else {
+      result = false;
+    }
+    setFormData({
       ...formData,
-      [e.target.name]: e.target.value.trim()
+      [text]: result
     });
     console.log(formData);
   };
@@ -112,7 +147,7 @@ const Form = () => {
                     type="checkbox"
                     id={setting}
                     name={setting}
-                    value="true"
+                    value={setting}
                     onChange={handleChange}
                   />
                 </label>

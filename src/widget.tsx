@@ -150,8 +150,23 @@ const addJupyterNotebook = async () => {
   const settings = ServerConnection.makeSettings({});
   const serverResponse = await ServerConnection.makeRequest(
     URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
-    { method: 'GET' },
-    // { method: 'POST', body: JSON.stringify() },
+    // { method: 'GET' },
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        preliminary: {
+          projectDescription: false,
+          importLibraries: false,
+          importData: false,
+          nullValues: false
+        },
+        descriptiveStat: {
+          histograms: true,
+          scatterPlots: false,
+          featureToFeatureCorr: false
+        }
+      })
+    },
     settings
   );
   const data = await serverResponse.json();

@@ -6,30 +6,6 @@ import { ServerConnection } from '@jupyterlab/services';
 
 import React, { useState } from 'react';
 
-const addJupyterNotebook = async () => {
-  console.log('processing');
-  const settings = ServerConnection.makeSettings({});
-  const serverResponse = await ServerConnection.makeRequest(
-    URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
-    { method: 'GET' },
-    // { method: 'POST', body: JSON.stringify({}) },
-    settings
-  );
-  const data = await serverResponse.json();
-  console.log(data);
-  return data.path;
-};
-
-const openNotebook = async (
-  app: JupyterFrontEnd,
-  path: string
-): Promise<void> => {
-  app.commands.execute('docmanager:open', {
-    factory: 'Notebook',
-    path
-  });
-};
-
 const notebookSettings = [
   'Project Description',
   'Import Data',
@@ -39,8 +15,8 @@ const notebookSettings = [
 
 const dataAnalysisSettings = [
   'Histogram',
-  'ScatterPlots',
-  'Feature to Feature Correlation Matrix'
+  'Scatter Plots',
+  'Feature to Feature Corr'
 ];
 
 const initialFormData = Object.freeze({
@@ -54,50 +30,59 @@ const initialFormData = Object.freeze({
   },
   descriptiveStat: {
     histograms: false,
-    scatterPlots: {
-      selected: false,
-      targetVar: ''
-    },
-    featureToFeatureCorr: {
-      selected: false,
-      targetVar: ''
-    }
+    scatterPlots: false,
+    featureToFeatureCorr: false
   }
 });
 
-const handleTextFormat = (text: {
-  target: { name: { split: () => string[] } };
-}) => {
-  const formattedText = text.target.name
-    .split()
-    .map(
-      (word: string) =>
-        word.charAt(0).toLowerCase() + word.substring(1) + word.trim()
-    )
-    .join('');
-  return formattedText;
+const handleTextFormat = (text: { target: { name: string } }) => {
+  const formattedText = text.target.name.replace(/\s/g, '');
+  return formattedText[0].toLowerCase() + formattedText.slice(1);
 };
 
 const Form = () => {
   const [formData, setFormData] = useState(initialFormData);
 
-  // const handlePreliminary = () => {
-  //   const preliminarySettings = { ...formData.preliminary };
-
-  // };
-
   const handleChange = (e: any) => {
     const text = handleTextFormat(e);
-    let result;
-    if (e.target.value !== false) {
-      result = true;
-    } else {
+    let result: any;
+    if (e.target.name === 'filePath') {
+      result = e.target.value;
+    } else if (e.target.checked === false) {
       result = false;
+    } else {
+      result = true;
     }
-    setFormData({
-      ...formData,
-      [text]: result
-    });
+
+    const handleSetting = (str: string) => {
+      console.log(str);
+      if (str[0] === 'p' || str[0] === 'i' || str[0] === 'n') {
+        setFormData({
+          ...formData,
+          preliminary: {
+            ...formData.preliminary,
+            [text]: result
+          }
+        });
+      } else if (str[0] === 'f') {
+        setFormData({
+          ...formData,
+          filePath: formData.filePath,
+          [text]: result
+        });
+      } else {
+        setFormData({
+          ...formData,
+          descriptiveStat: {
+            ...formData.descriptiveStat,
+            [text]: result
+          }
+        });
+      }
+    };
+
+    handleSetting(text);
+
     console.log(formData);
   };
 
@@ -114,10 +99,10 @@ const Form = () => {
       </label>
       <h2>Notebook Settings</h2>
       <ul className="notebook-settings-list">
-        {notebookSettings.map((setting, index) => {
+        {notebookSettings.map(setting => {
           return (
             <>
-              <li key={index}></li>
+              <li key={setting.trim()}></li>
               <div className="notebook-settings-item">
                 <label>
                   {setting}
@@ -136,10 +121,10 @@ const Form = () => {
       </ul>
       <h2>Types of Data Analysis</h2>
       <ul className="data-settings-list">
-        {dataAnalysisSettings.map((setting, index) => {
+        {dataAnalysisSettings.map(setting => {
           return (
             <>
-              <li key={index}></li>
+              <li key={setting.trim()}></li>
               <div className="notebook-settings-item">
                 <label>
                   {setting}
@@ -160,6 +145,30 @@ const Form = () => {
   );
 };
 
+const addJupyterNotebook = async () => {
+  console.log('processing');
+  const settings = ServerConnection.makeSettings({});
+  const serverResponse = await ServerConnection.makeRequest(
+    URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
+    { method: 'GET' },
+    // { method: 'POST', body: JSON.stringify() },
+    settings
+  );
+  const data = await serverResponse.json();
+  console.log(data);
+  return data.path;
+};
+
+const openNotebook = async (
+  app: JupyterFrontEnd,
+  path: string
+): Promise<void> => {
+  app.commands.execute('docmanager:open', {
+    factory: 'Notebook',
+    path
+  });
+};
+
 export class CounterWidget extends ReactWidget {
   /**
    * Constructs a new CounterWidget.
@@ -172,6 +181,7 @@ export class CounterWidget extends ReactWidget {
     this.browser = browser;
     this.addClass('jp-Templatify');
   }
+
   render(): JSX.Element {
     return (
       <>

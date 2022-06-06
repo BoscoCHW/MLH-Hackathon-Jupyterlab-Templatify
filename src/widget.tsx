@@ -4,7 +4,146 @@ import { URLExt } from '@jupyterlab/coreutils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ServerConnection } from '@jupyterlab/services';
 
-import React from 'react';
+import React, { useState } from 'react';
+
+const notebookSettings = [
+  'Project Description',
+  'Import Data',
+  'Import Libraries',
+  'Null Values'
+];
+
+const dataAnalysisSettings = [
+  'Histogram',
+  'Scatter Plots',
+  'Feature to Feature Corr'
+];
+
+const initialFormData = Object.freeze({
+  filePath: '',
+  preliminary: {
+    projectDescription: false,
+    importLibraries: false,
+    importData: false,
+    columnsToDrop: '',
+    nullValues: false
+  },
+  descriptiveStat: {
+    histograms: false,
+    scatterPlots: false,
+    featureToFeatureCorr: false
+  }
+});
+
+const handleTextFormat = (text: { target: { name: string } }) => {
+  const formattedText = text.target.name.replace(/\s/g, '');
+  return formattedText[0].toLowerCase() + formattedText.slice(1);
+};
+
+const Form = () => {
+  const [formData, setFormData] = useState(initialFormData);
+
+  const handleChange = (e: any) => {
+    const text = handleTextFormat(e);
+    let result: any;
+    if (e.target.name === 'filePath') {
+      result = e.target.value;
+    } else if (e.target.checked === false) {
+      result = false;
+    } else {
+      result = true;
+    }
+
+    const handleSetting = (str: string) => {
+      console.log(str);
+      if (str[0] === 'p' || str[0] === 'i' || str[0] === 'n') {
+        setFormData({
+          ...formData,
+          preliminary: {
+            ...formData.preliminary,
+            [text]: result
+          }
+        });
+      } else if (str[0] === 'f') {
+        setFormData({
+          ...formData,
+          filePath: formData.filePath,
+          [text]: result
+        });
+      } else {
+        setFormData({
+          ...formData,
+          descriptiveStat: {
+            ...formData.descriptiveStat,
+            [text]: result
+          }
+        });
+      }
+    };
+
+    handleSetting(text);
+
+    console.log(formData);
+  };
+
+  return (
+    <form id="settingsForm">
+      <label>
+        Please select a csv file to proceed.
+        <input
+          type="file"
+          id="filePath"
+          name="filePath"
+          onChange={handleChange}
+        />
+      </label>
+      <h2>Notebook Settings</h2>
+      <ul className="notebook-settings-list">
+        {notebookSettings.map(setting => {
+          return (
+            <>
+              <li key={setting.trim()}></li>
+              <div className="notebook-settings-item">
+                <label>
+                  {setting}
+                  <input
+                    type="checkbox"
+                    id={setting}
+                    name={setting}
+                    value={setting}
+                    onChange={handleChange}
+                  />
+                </label>
+              </div>
+            </>
+          );
+        })}
+      </ul>
+      <h2>Types of Data Analysis</h2>
+      <ul className="data-settings-list">
+        {dataAnalysisSettings.map(setting => {
+          return (
+            <>
+              <li key={setting.trim()}></li>
+              <div className="notebook-settings-item">
+                <label>
+                  {setting}
+                  <input
+                    type="checkbox"
+                    id={setting}
+                    name={setting}
+                    value={setting}
+                    onChange={handleChange}
+                  />
+                </label>
+              </div>
+            </>
+          );
+        })}
+      </ul>
+    </form>
+  );
+};
 
 const addJupyterNotebook = async () => {
   console.log('processing');
@@ -12,6 +151,7 @@ const addJupyterNotebook = async () => {
   const serverResponse = await ServerConnection.makeRequest(
     URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
     { method: 'GET' },
+    // { method: 'POST', body: JSON.stringify() },
     settings
   );
   const data = await serverResponse.json();
@@ -29,19 +169,6 @@ const openNotebook = async (
   });
 };
 
-/**
- * React component for a counter.
- *
- * @returns The React component
- */
-// const CounterComponent = ({ app: JupyterFrontEnd }): JSX.Element => {
-//   const [counter, setCounter] = useState(0)
-//   return ;
-// };
-
-/**
- * A Counter Lumino Widget that wraps a CounterComponent.
- */
 export class CounterWidget extends ReactWidget {
   /**
    * Constructs a new CounterWidget.
@@ -52,22 +179,27 @@ export class CounterWidget extends ReactWidget {
     super();
     this.app = app;
     this.browser = browser;
-    this.addClass('jp-ReactWidget');
+    this.addClass('jp-Templatify');
   }
 
   render(): JSX.Element {
     return (
-      <div>
-        <p>Click me to create a Jupyter notebook template!</p>
-        <button
-          onClick={async (): Promise<void> => {
-            const path = await addJupyterNotebook();
-            openNotebook(this.app, path);
-          }}
-        >
-          Go
-        </button>
-      </div>
+      <>
+        <div className="templatify-body">
+          <h1>Templatify</h1>
+          <p>Create a Jupyter notebook template</p>
+          <br />
+          <Form />
+          <button
+            onClick={async (): Promise<void> => {
+              const path = await addJupyterNotebook();
+              openNotebook(this.app, path);
+            }}
+          >
+            Generate
+          </button>
+        </div>
+      </>
     );
   }
 }

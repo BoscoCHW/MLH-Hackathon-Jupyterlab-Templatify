@@ -12,7 +12,7 @@ const addJupyterNotebook = async () => {
   const serverResponse = await ServerConnection.makeRequest(
     URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
     { method: 'GET' },
-    // {method: 'POST', body: JSON.stringify()}
+    // { method: 'POST', body: JSON.stringify({}) },
     settings
   );
   const data = await serverResponse.json();
@@ -37,21 +37,94 @@ const notebookSettings = [
   'Null Values'
 ];
 
-const dataAnalysisSettings = ['Histogram'];
+const dataAnalysisSettings = [
+  'Histogram',
+  'ScatterPlots',
+  'Feature to Feature Correlation Matrix'
+];
 
-/**
- * React component for a counter.
- *
- * @returns The React component
- */
-// const CounterComponent = ({ app: JupyterFrontEnd }): JSX.Element => {
-//   const [counter, setCounter] = useState(0)
-//   return ;
-// };
+const initialFormData = Object.freeze({
+  filePath: '',
+  'Project Description': '',
+  'Import Data': '',
+  'Import Libraries': '',
+  'Null Values': '',
+  Histogram: '',
+  ScatterPlots: '',
+  'Feature to Feature Correlation Matrix': ''
+});
 
-/**
- * A Counter Lumino Widget that wraps a CounterComponent.
- */
+const Form = () => {
+  const [formData, updateFormData] = React.useState(initialFormData);
+
+  const handleChange = (e: any) => {
+    console.log(e);
+    updateFormData({
+      ...formData,
+      [e.target.name]: e.target.value.trim()
+    });
+    console.log(formData);
+  };
+
+  return (
+    <form id="settingsForm">
+      <label>
+        Please select a csv file to proceed.
+        <input
+          type="file"
+          id="filePath"
+          name="filePath"
+          onChange={handleChange}
+        />
+      </label>
+      <h2>Notebook Settings</h2>
+      <ul className="notebook-settings-list">
+        {notebookSettings.map((setting, index) => {
+          return (
+            <>
+              <li key={index}></li>
+              <div className="notebook-settings-item">
+                <label>
+                  {setting}
+                  <input
+                    type="checkbox"
+                    id={setting}
+                    name={setting}
+                    value={setting}
+                    onChange={handleChange}
+                  />
+                </label>
+              </div>
+            </>
+          );
+        })}
+      </ul>
+      <h2>Types of Data Analysis</h2>
+      <ul className="data-settings-list">
+        {dataAnalysisSettings.map((setting, index) => {
+          return (
+            <>
+              <li key={index}></li>
+              <div className="notebook-settings-item">
+                <label>
+                  {setting}
+                  <input
+                    type="checkbox"
+                    id={setting}
+                    name={setting}
+                    value="true"
+                    onChange={handleChange}
+                  />
+                </label>
+              </div>
+            </>
+          );
+        })}
+      </ul>
+    </form>
+  );
+};
+
 export class CounterWidget extends ReactWidget {
   /**
    * Constructs a new CounterWidget.
@@ -64,58 +137,14 @@ export class CounterWidget extends ReactWidget {
     this.browser = browser;
     this.addClass('jp-Templatify');
   }
-
   render(): JSX.Element {
     return (
-      <div className="templatify-body">
-        <h1>Templatify</h1>
-        <p>Create a Jupyter notebook template</p>
-        <br />
-        <label>
-          Please select a csv file to proceed.
-          <input type="file" id="filePath" name="filePath" />
-          <h2>Notebook Settings</h2>
-          <ul className="settings-list">
-            {notebookSettings.map((setting, index) => {
-              return (
-                <>
-                  <li key={index}></li>
-                  <div className="notebook-settings-item">
-                    <label>
-                      {setting}
-                      <input
-                        type="checkbox"
-                        id={'checkbox-${index}'}
-                        name={setting}
-                        value={setting}
-                      />
-                    </label>
-                  </div>
-                </>
-              );
-            })}
-          </ul>
-          <h2>Types of Data Analysis</h2>
-          <ul className="settings-list">
-            {dataAnalysisSettings.map((setting, index) => {
-              return (
-                <>
-                  <li key={index}></li>
-                  <div className="notebook-settings-item">
-                    <label>
-                      {setting}
-                      <input
-                        type="checkbox"
-                        id={'checkbox-${index}'}
-                        name={setting}
-                        value={setting}
-                      />
-                    </label>
-                  </div>
-                </>
-              );
-            })}
-          </ul>
+      <>
+        <div className="templatify-body">
+          <h1>Templatify</h1>
+          <p>Create a Jupyter notebook template</p>
+          <br />
+          <Form />
           <button
             onClick={async (): Promise<void> => {
               const path = await addJupyterNotebook();
@@ -124,8 +153,8 @@ export class CounterWidget extends ReactWidget {
           >
             Generate
           </button>
-        </label>
-      </div>
+        </div>
+      </>
     );
   }
 }

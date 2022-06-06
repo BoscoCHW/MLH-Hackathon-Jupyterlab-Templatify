@@ -112,3 +112,7 @@ dmypy.json
 
 # OSX files
 .DS_Store
+
+
+test_data
+.vscode

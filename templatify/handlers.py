@@ -15,7 +15,7 @@ class RouteHandler(APIHandler):
     @tornado.web.authenticated
     def post(self):
         req_body = self.get_json_body()
-
+        print(req_body)
         with (HERE / "code_blocks.json").open() as f:
             code_blocks = json.load(f)
         

@@ -14,18 +14,38 @@ const notebookSettings = [
 ];
 
 const dataAnalysisSettings = [
-  'Histogram',
+  'Histograms',
   'Scatter Plots',
-  'Feature to Feature Corr'
+  'Feature To Feature Corr'
 ];
 
+type NotebookConfig = {
+  // filePath: string;
+  preliminary: {
+    projectDescription: boolean;
+    importLibraries: boolean;
+    importData: boolean;
+    columnsToDrop?: string;
+    nullValues: boolean;
+  };
+  descriptiveStat: {
+    histograms: boolean;
+    scatterPlots: boolean;
+    featureToFeatureCorr: boolean;
+  };
+};
+
+type FormComponentProps = {
+  handleClick(notebookConfig: NotebookConfig): void;
+};
+
 const initialFormData = Object.freeze({
-  filePath: '',
+  // filePath: '',
   preliminary: {
     projectDescription: false,
     importLibraries: false,
     importData: false,
-    columnsToDrop: '',
+    // columnsToDrop: '',
     nullValues: false
   },
   descriptiveStat: {
@@ -40,7 +60,9 @@ const handleTextFormat = (text: { target: { name: string } }) => {
   return formattedText[0].toLowerCase() + formattedText.slice(1);
 };
 
-const Form = () => {
+const FormComponent: React.FunctionComponent<FormComponentProps> = ({
+  handleClick
+}): JSX.Element => {
   const [formData, setFormData] = useState(initialFormData);
 
   const handleChange = (e: any) => {
@@ -67,7 +89,7 @@ const Form = () => {
       } else if (str[0] === 'f') {
         setFormData({
           ...formData,
-          filePath: formData.filePath,
+          // filePath: formData.filePath,
           [text]: result
         });
       } else {
@@ -87,65 +109,77 @@ const Form = () => {
   };
 
   return (
-    <form id="settingsForm">
-      <label>
-        Please select a csv file to proceed.
-        <input
-          type="file"
-          id="filePath"
-          name="filePath"
-          onChange={handleChange}
-        />
-      </label>
-      <h2>Notebook Settings</h2>
-      <ul className="notebook-settings-list">
-        {notebookSettings.map(setting => {
-          return (
-            <>
-              <li key={setting.trim()}></li>
-              <div className="notebook-settings-item">
-                <label>
-                  {setting}
-                  <input
-                    type="checkbox"
-                    id={setting}
-                    name={setting}
-                    value={setting}
-                    onChange={handleChange}
-                  />
-                </label>
-              </div>
-            </>
-          );
-        })}
-      </ul>
-      <h2>Types of Data Analysis</h2>
-      <ul className="data-settings-list">
-        {dataAnalysisSettings.map(setting => {
-          return (
-            <>
-              <li key={setting.trim()}></li>
-              <div className="notebook-settings-item">
-                <label>
-                  {setting}
-                  <input
-                    type="checkbox"
-                    id={setting}
-                    name={setting}
-                    value={setting}
-                    onChange={handleChange}
-                  />
-                </label>
-              </div>
-            </>
-          );
-        })}
-      </ul>
-    </form>
+    <div className="templatify-body">
+      <h1>Templatify</h1>
+      <p>Create a Jupyter notebook template</p>
+      <form id="settingsForm">
+        {/* <label>
+          Please select a csv file to proceed.
+          <input
+            type="file"
+            id="filePath"
+            name="filePath"
+            onChange={handleChange}
+          />
+        </label> */}
+        <h2>Notebook Settings</h2>
+        <ul className="notebook-settings-list">
+          {notebookSettings.map(setting => {
+            return (
+              <>
+                <li key={setting.trim()}></li>
+                <div className="notebook-settings-item">
+                  <label>
+                    {setting}
+                    <input
+                      type="checkbox"
+                      id={setting}
+                      name={setting}
+                      value={setting}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </div>
+              </>
+            );
+          })}
+        </ul>
+        <h2>Types of Data Analysis</h2>
+        <ul className="data-settings-list">
+          {dataAnalysisSettings.map(setting => {
+            return (
+              <>
+                <li key={setting.trim()}></li>
+                <div className="notebook-settings-item">
+                  <label>
+                    {setting}
+                    <input
+                      type="checkbox"
+                      id={setting}
+                      name={setting}
+                      value={setting}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </div>
+              </>
+            );
+          })}
+        </ul>
+        <button
+          onClick={e => {
+            e.preventDefault();
+            handleClick(formData);
+          }}
+        >
+          Generate
+        </button>
+      </form>
+    </div>
   );
 };
 
-const addJupyterNotebook = async () => {
+const addJupyterNotebook = async (body: NotebookConfig) => {
   console.log('processing');
   const settings = ServerConnection.makeSettings({});
   const serverResponse = await ServerConnection.makeRequest(
@@ -153,19 +187,7 @@ const addJupyterNotebook = async () => {
     // { method: 'GET' },
     {
       method: 'POST',
-      body: JSON.stringify({
-        preliminary: {
-          projectDescription: false,
-          importLibraries: false,
-          importData: false,
-          nullValues: false
-        },
-        descriptiveStat: {
-          histograms: true,
-          scatterPlots: false,
-          featureToFeatureCorr: false
-        }
-      })
+      body: JSON.stringify(body)
     },
     settings
   );
@@ -199,22 +221,12 @@ export class CounterWidget extends ReactWidget {
 
   render(): JSX.Element {
     return (
-      <>
-        <div className="templatify-body">
-          <h1>Templatify</h1>
-          <p>Create a Jupyter notebook template</p>
-          <br />
-          <Form />
-          <button
-            onClick={async (): Promise<void> => {
-              const path = await addJupyterNotebook();
-              openNotebook(this.app, path);
-            }}
-          >
-            Generate
-          </button>
-        </div>
-      </>
+      <FormComponent
+        handleClick={async (formData: NotebookConfig): Promise<void> => {
+          const path = await addJupyterNotebook(formData);
+          openNotebook(this.app, path);
+        }}
+      />
     );
   }
 }

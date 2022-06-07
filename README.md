@@ -1,7 +1,7 @@
 # templatify
 **Note: Please use our dev branch to test the application.
 
-[![Github Actions Status](https://github.com/BoscoCHW/MLH-Jupyter-Extension.git/workflows/Build/badge.svg)](https://github.com/BoscoCHW/MLH-Jupyter-Extension.git/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BoscoCHW/MLH-Jupyter-Extension.git/main?urlpath=lab)
+[![Github Actions Status](https://github.com/BoscoCHW/MLH-Hackathon-Jupyterlab-Templatify.git/workflows/Build/badge.svg)](https://github.com/BoscoCHW/MLH-Hackathon-Jupyterlab-Templatify.git/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MLH-Hackathon-Jupyterlab-Templatify.git/main?urlpath=lab)
 Generate data analysis templates given a csv file
 
 ## Requirements

@@ -21,7 +21,10 @@ class RouteHandler(APIHandler):
         
         cells = []
         for category, category_config in req_body.items():
-            # if category == "filename"
+            if category == "filePath":
+                path = category_config
+                path
+
             for key, val in category_config.items():
                 if val == True:
                     cells.extend(code_blocks[category][key])

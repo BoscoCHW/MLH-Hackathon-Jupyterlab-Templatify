@@ -20,7 +20,7 @@ const dataAnalysisSettings = [
 ];
 
 type NotebookConfig = {
-  // filePath: string;
+  filePath: string;
   preliminary: {
     projectDescription: boolean;
     importLibraries: boolean;
@@ -40,7 +40,7 @@ type FormComponentProps = {
 };
 
 const initialFormData = Object.freeze({
-  // filePath: '',
+  filePath: '',
   preliminary: {
     projectDescription: false,
     importLibraries: false,
@@ -67,7 +67,7 @@ const FormComponent: React.FunctionComponent<FormComponentProps> = ({
 
   const handleChange = (e: any) => {
     const text = handleTextFormat(e);
-    let result: any;
+    let result: string | boolean;
     if (e.target.name === 'filePath') {
       result = e.target.value;
     } else if (e.target.checked === false) {
@@ -113,7 +113,7 @@ const FormComponent: React.FunctionComponent<FormComponentProps> = ({
       <h1>Templatify</h1>
       <p>Create a Jupyter notebook template</p>
       <form id="settingsForm">
-        {/* <label>
+        <label>
           Please select a csv file to proceed.
           <input
             type="file"
@@ -121,7 +121,7 @@ const FormComponent: React.FunctionComponent<FormComponentProps> = ({
             name="filePath"
             onChange={handleChange}
           />
-        </label> */}
+        </label>
         <h2>Notebook Settings</h2>
         <ul className="notebook-settings-list">
           {notebookSettings.map(setting => {

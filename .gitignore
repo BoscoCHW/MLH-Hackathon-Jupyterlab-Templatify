@@ -116,3 +116,6 @@ dmypy.json
 
 test_data
 .vscode
+
+
+*.ipynb

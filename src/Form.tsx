@@ -1,9 +1,3 @@
-import { JupyterFrontEnd } from '@jupyterlab/application';
-import { ReactWidget } from '@jupyterlab/apputils';
-import { URLExt } from '@jupyterlab/coreutils';
-import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
-import { ServerConnection } from '@jupyterlab/services';
-
 import React, { useState } from 'react';
 
 const notebookSettings = [
@@ -19,7 +13,7 @@ const dataAnalysisSettings = [
   'Feature To Feature Corr'
 ];
 
-type NotebookConfig = {
+export interface INotebookConfig {
   // filePath: string;
   preliminary: {
     projectDescription: boolean;
@@ -33,10 +27,15 @@ type NotebookConfig = {
     scatterPlots: boolean;
     featureToFeatureCorr: boolean;
   };
-};
+}
 
-type FormComponentProps = {
-  handleClick(notebookConfig: NotebookConfig): void;
+export interface IFormProps {
+  handleClick(notebookConfig: INotebookConfig): void;
+}
+
+const handleTextFormat = (text: { target: { name: string } }) => {
+  const formattedText = text.target.name.replace(/\s/g, '');
+  return formattedText[0].toLowerCase() + formattedText.slice(1);
 };
 
 const initialFormData = Object.freeze({
@@ -55,12 +54,7 @@ const initialFormData = Object.freeze({
   }
 });
 
-const handleTextFormat = (text: { target: { name: string } }) => {
-  const formattedText = text.target.name.replace(/\s/g, '');
-  return formattedText[0].toLowerCase() + formattedText.slice(1);
-};
-
-const FormComponent: React.FunctionComponent<FormComponentProps> = ({
+export const FormComponent: React.FunctionComponent<IFormProps> = ({
   handleClick
 }): JSX.Element => {
   const [formData, setFormData] = useState(initialFormData);
@@ -178,55 +172,3 @@ const FormComponent: React.FunctionComponent<FormComponentProps> = ({
     </div>
   );
 };
-
-const addJupyterNotebook = async (body: NotebookConfig) => {
-  console.log('processing');
-  const settings = ServerConnection.makeSettings({});
-  const serverResponse = await ServerConnection.makeRequest(
-    URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
-    // { method: 'GET' },
-    {
-      method: 'POST',
-      body: JSON.stringify(body)
-    },
-    settings
-  );
-  const data = await serverResponse.json();
-  console.log(data);
-  return data.path;
-};
-
-const openNotebook = async (
-  app: JupyterFrontEnd,
-  path: string
-): Promise<void> => {
-  app.commands.execute('docmanager:open', {
-    factory: 'Notebook',
-    path
-  });
-};
-
-export class TemplatifyForm extends ReactWidget {
-  /**
-   * Constructs a new CounterWidget.
-   */
-  app: JupyterFrontEnd;
-  browser: IFileBrowserFactory; // unused, can delete
-  constructor(app: JupyterFrontEnd, browser: IFileBrowserFactory) {
-    super();
-    this.app = app;
-    this.browser = browser;
-    this.addClass('jp-Templatify');
-  }
-
-  render(): JSX.Element {
-    return (
-      <FormComponent
-        handleClick={async (formData: NotebookConfig): Promise<void> => {
-          const path = await addJupyterNotebook(formData);
-          openNotebook(this.app, path);
-        }}
-      />
-    );
-  }
-}

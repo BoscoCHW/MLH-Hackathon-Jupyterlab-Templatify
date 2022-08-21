@@ -6,7 +6,7 @@ import { MainAreaWidget } from '@jupyterlab/apputils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ILauncher } from '@jupyterlab/launcher';
 import { reactIcon } from '@jupyterlab/ui-components';
-import { TemplatifyForm } from './TemplatifyForm';
+import { Templatify } from './Templatify';
 
 /**
  * The command IDs used by the react-widget plugin.
@@ -36,8 +36,8 @@ const extension: JupyterFrontEndPlugin<void> = {
       label: 'Templatify',
       icon: args => (args['isPalette'] ? undefined : reactIcon),
       execute: () => {
-        const content = new TemplatifyForm(app, browser);
-        const widget = new MainAreaWidget<TemplatifyForm>({ content });
+        const content = new Templatify(app, browser);
+        const widget = new MainAreaWidget<Templatify>({ content });
         widget.title.label = 'Templatify';
         widget.title.icon = reactIcon;
         app.shell.add(widget, 'main');

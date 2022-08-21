@@ -2,21 +2,17 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
-
 import { ILauncher } from '@jupyterlab/launcher';
-
 import { reactIcon } from '@jupyterlab/ui-components';
-
-import { CounterWidget } from './widget';
+import { TemplatifyForm } from './TemplatifyForm';
 
 /**
  * The command IDs used by the react-widget plugin.
  */
 namespace CommandIDs {
-  export const create = 'create-react-widget';
+  export const form = 'templatify-form';
 }
 
 /**
@@ -34,14 +30,14 @@ const extension: JupyterFrontEndPlugin<void> = {
   ) => {
     const { commands } = app;
 
-    const command = CommandIDs.create;
+    const command = CommandIDs.form;
     commands.addCommand(command, {
       caption: 'Create a Jupyter Notebook Template',
       label: 'Templatify',
       icon: args => (args['isPalette'] ? undefined : reactIcon),
       execute: () => {
-        const content = new CounterWidget(app, browser);
-        const widget = new MainAreaWidget<CounterWidget>({ content });
+        const content = new TemplatifyForm(app, browser);
+        const widget = new MainAreaWidget<TemplatifyForm>({ content });
         widget.title.label = 'Templatify';
         widget.title.icon = reactIcon;
         app.shell.add(widget, 'main');

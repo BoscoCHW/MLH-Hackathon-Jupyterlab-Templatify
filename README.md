@@ -1,7 +1,8 @@
-# templatify
+# Templatify
 
-[![Github Actions Status](https://github.com/BoscoCHW/MLH-Hackathon-Jupyterlab-Templatify.git/workflows/Build/badge.svg)](https://github.com/BoscoCHW/MLH-Hackathon-Jupyterlab-Templatify.git/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MLH-Hackathon-Jupyterlab-Templatify.git/main?urlpath=lab)
-Generate data analysis templates given a csv file
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MLH-Hackathon-Jupyterlab-Templatify.git/main?urlpath=lab)
+
+Templatify is an extension for JupyterLab that allows users to create customizable Jupyter Notebook templates based on uploaded data from a csv file to streamline their data analysis workflow. The extension allows users to select a csv file and choose the types of data analysis that they would like to perform. These analyses can range from histograms, scatter plots, to correlation matrices.
 
 ## Requirements
 

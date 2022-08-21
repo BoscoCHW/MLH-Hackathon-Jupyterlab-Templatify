@@ -206,7 +206,7 @@ const openNotebook = async (
   });
 };
 
-export class CounterWidget extends ReactWidget {
+export class TemplatifyForm extends ReactWidget {
   /**
    * Constructs a new CounterWidget.
    */

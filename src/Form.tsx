@@ -14,7 +14,7 @@ const dataAnalysisSettings = [
 ];
 
 export interface INotebookConfig {
-  // filePath: string;
+  filePath: string;
   preliminary: {
     projectDescription: boolean;
     importLibraries: boolean;
@@ -39,7 +39,7 @@ const handleTextFormat = (text: { target: { name: string } }) => {
 };
 
 const initialFormData = Object.freeze({
-  // filePath: '',
+  filePath: '',
   preliminary: {
     projectDescription: false,
     importLibraries: false,
@@ -71,7 +71,6 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
     }
 
     const handleSetting = (str: string) => {
-      console.log(str);
       if (str[0] === 'p' || str[0] === 'i' || str[0] === 'n') {
         setFormData({
           ...formData,
@@ -80,11 +79,14 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             [text]: result
           }
         });
-      } else if (str[0] === 'f') {
+      } else if (str === 'filePath') {
         setFormData({
           ...formData,
-          // filePath: formData.filePath,
-          [text]: result
+          filePath: result
+          // descriptiveStat: {
+          //   ...formData.descriptiveStat,
+          //   [text]: result
+          // }
         });
       } else {
         setFormData({
@@ -98,8 +100,6 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
     };
 
     handleSetting(text);
-
-    console.log(formData);
   };
 
   return (
@@ -107,7 +107,7 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
       <h1>Templatify</h1>
       <p>Create a Jupyter notebook template</p>
       <form id="settingsForm">
-        {/* <label>
+        <label>
           Please select a csv file to proceed.
           <input
             type="file"
@@ -115,7 +115,7 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             name="filePath"
             onChange={handleChange}
           />
-        </label> */}
+        </label>
         <h2>Notebook Settings</h2>
         <ul className="notebook-settings-list">
           {notebookSettings.map(setting => {

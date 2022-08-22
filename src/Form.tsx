@@ -24,19 +24,23 @@ const LIBRARIES = [
 
 const rendererFactory =
   (type: string) =>
-  (name: string, id: string, changeHandler: React.ChangeEventHandler) => {
+  (
+    name: string,
+    id: string,
+    ...changeHandlers: React.ChangeEventHandler<HTMLInputElement>[]
+  ) => {
     if (type === 'simple-checkbox') {
       return (
         <div className="notebook-settings-item">
           <label>
-            {name}
             <input
               type="checkbox"
               id={id}
               name={id}
               value={id}
-              onChange={changeHandler}
+              onChange={changeHandlers[0]}
             />
+            <span>{name}</span>
           </label>
         </div>
       );
@@ -44,24 +48,70 @@ const rendererFactory =
       return (
         <div className="notebook-settings-item">
           <div> {name} </div>
-          {LIBRARIES.map(library => (
-            <label key={library.id}>
-              {library.name}
-              <input
-                type="checkbox"
-                id={library.id}
-                name={library.id}
-                value={library.id}
-                onChange={changeHandler}
-              />
-            </label>
-          ))}
+          <div>
+            {LIBRARIES.map(library => (
+              <label key={library.id}>
+                <input
+                  type="checkbox"
+                  id={library.id}
+                  name={library.id}
+                  value={library.id}
+                  onChange={changeHandlers[0]}
+                />
+                <span>{library.name}</span>
+              </label>
+            ))}
+          </div>
         </div>
       );
     } else if (type === 'scatter-plots') {
-      return <div></div>;
-    } else if (type === 'Feature To Feature Corr') {
-      return <div></div>;
+      return (
+        <div className="notebook-settings-item">
+          <label>
+            <input
+              type="checkbox"
+              id={id}
+              name={id}
+              value={id}
+              onChange={changeHandlers[0]}
+            />
+            <span>{name}</span>
+          </label>
+          <label>
+            <span> Y-var: </span>
+            <input
+              type="text"
+              id="y-var"
+              name="y-var"
+              onChange={changeHandlers[1]}
+            />
+          </label>
+        </div>
+      );
+    } else if (type === 'feature-to-feature-corr') {
+      return (
+        <div className="notebook-settings-item">
+          <label key={id}>
+            <input
+              type="checkbox"
+              id={id}
+              name={id}
+              value={id}
+              onChange={changeHandlers[0]}
+            />
+            {name}
+          </label>
+          <label>
+            <span> Target Variable: </span>
+            <input
+              type="text"
+              id="target-var"
+              name="target-var"
+              onChange={changeHandlers[1]}
+            />
+          </label>
+        </div>
+      );
     } else {
       return <></>;
     }
@@ -102,7 +152,7 @@ const DESCRIPTIVE_STAT_OPTIONS = [
     renderer: rendererFactory('scatter-plots')
   },
   {
-    name: 'Feature To Feature Corr',
+    name: 'Feature To Feature Correlation',
     id: 'feature-to-feature-corr',
     renderer: rendererFactory('feature-to-feature-corr')
   }
@@ -118,12 +168,13 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
   const [filePath, setFilePath] = useState<string>('');
   const [preliminaryConfig, setPreliminaryConfig] =
     useState<IPreliminaryConfig>({});
-  const [descriptiveStatConfig] = useState<IDescriptiveStatConfig>({});
-  console.log(preliminaryConfig, filePath);
+  const [descriptiveStatConfig, setDescriptiveStatConfig] =
+    useState<IDescriptiveStatConfig>({});
+  console.log(preliminaryConfig, descriptiveStatConfig, filePath);
   return (
     <div className="templatify-body">
       <h1>Templatify</h1>
-      <p>Create a Jupyter notebook template</p>
+      <p>Create a Jupyter notebook template!</p>
       <form id="settingsForm">
         <label>
           Please select a csv file to proceed.
@@ -140,11 +191,32 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
               const fieldNameCamalCase = idToCamalCase(id);
               if (fieldNameCamalCase === 'importLibraries') {
-                setPreliminaryConfig({ importLibraries: [e.target.value] });
-              } else {
-                setPreliminaryConfig({
-                  [fieldNameCamalCase]: e.target.checked
+                setPreliminaryConfig(prevState => {
+                  if (e.target.checked) {
+                    return {
+                      ...prevState,
+                      importLibraries: prevState.importLibraries
+                        ? [...prevState.importLibraries, e.target.value]
+                        : [e.target.value]
+                    };
+                  } else {
+                    if (prevState.importLibraries) {
+                      return {
+                        ...prevState,
+                        importLibraries: prevState.importLibraries.filter(
+                          lib => lib !== e.target.value
+                        )
+                      };
+                    } else {
+                      return prevState;
+                    }
+                  }
                 });
+              } else {
+                setPreliminaryConfig(prevState => ({
+                  ...prevState,
+                  [fieldNameCamalCase]: e.target.checked
+                }));
               }
             };
             return renderer(name, id, changeHandler);
@@ -153,17 +225,55 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
         <h2>Types of Data Analysis</h2>
         <ul className="data-settings-list">
           {DESCRIPTIVE_STAT_OPTIONS.map(({ name, id, renderer }) => {
-            const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-              const fieldNameCamalCase = idToCamalCase(id);
-              if (fieldNameCamalCase === 'importLibraries') {
-                setPreliminaryConfig({ importLibraries: [e.target.value] });
-              } else {
-                setPreliminaryConfig({
+            const fieldNameCamalCase = idToCamalCase(id);
+            const checkBoxChangeHandler = (
+              e: React.ChangeEvent<HTMLInputElement>
+            ) =>
+              setDescriptiveStatConfig(prevState => {
+                if (fieldNameCamalCase === 'scatterPlots') {
+                  if (e.target.checked) {
+                    return {
+                      ...prevState,
+                      [fieldNameCamalCase]: (
+                        document.querySelector('#y-var') as HTMLInputElement
+                      ).value
+                    };
+                  } else {
+                    delete prevState[fieldNameCamalCase];
+                    return prevState;
+                  }
+                }
+                if (fieldNameCamalCase === 'featureToFeatureCorr') {
+                  if (e.target.checked) {
+                    return {
+                      ...prevState,
+                      [fieldNameCamalCase]: (
+                        document.querySelector(
+                          '#target-var'
+                        ) as HTMLInputElement
+                      ).value
+                    };
+                  } else {
+                    delete prevState[fieldNameCamalCase];
+                    return prevState;
+                  }
+                }
+                return {
+                  ...prevState,
                   [fieldNameCamalCase]: e.target.checked
-                });
-              }
-            };
-            return renderer(name, id, changeHandler);
+                };
+              });
+
+            const handlers = [checkBoxChangeHandler];
+            if (fieldNameCamalCase !== 'histogram') {
+              handlers.push(e =>
+                setDescriptiveStatConfig(prevState => ({
+                  ...prevState,
+                  [fieldNameCamalCase]: e.target.value
+                }))
+              );
+            }
+            return renderer(name, id, ...handlers);
           })}
         </ul>
         <button

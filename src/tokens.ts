@@ -14,11 +14,6 @@ export interface IPreliminaryConfig {
 
 export interface IDescriptiveStatConfig {
   histograms?: boolean;
-  scatterPlots?: {
-    numOfPlotsPerRow: number;
-    yVar: string;
-  };
-  featureToFeatureCorr?: {
-    targetVariable: string;
-  };
+  scatterPlots?: string;
+  featureToFeatureCorr?: string;
 }

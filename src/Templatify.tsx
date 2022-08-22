@@ -4,7 +4,8 @@ import { URLExt } from '@jupyterlab/coreutils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ServerConnection } from '@jupyterlab/services';
 import React from 'react';
-import { FormComponent, INotebookConfig } from './Form';
+import { FormComponent } from './Form';
+import { INotebookConfig } from './tokens';
 
 const addJupyterNotebook = async (body: INotebookConfig) => {
   const settings = ServerConnection.makeSettings({});

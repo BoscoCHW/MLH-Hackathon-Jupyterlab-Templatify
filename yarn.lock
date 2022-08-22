@@ -6015,10 +6015,10 @@
   "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.1.6.tgz"
   "version" "4.1.6"
 
-"typestyle@^2.0.4":
-  "integrity" "sha512-JZd1R5cWxRvwXzPAKVFsbxO/QjDkFeQlqGF6ZxR7IREEXyFQrf1f1mmlx5EynOTItLLx4aBbcVpCH+CDsl5ZTw=="
-  "resolved" "https://registry.npmjs.org/typestyle/-/typestyle-2.3.0.tgz"
-  "version" "2.3.0"
+"typestyle@^2.0.4", "typestyle@^2.4.0":
+  "integrity" "sha512-/d1BL6Qi+YlMLEydnUEB8KL/CAjAN8cyt3/UyGnOyBrWf7bLGcR/6yhmsaUstO2IcYwZfagjE7AIzuI2vUW9mg=="
+  "resolved" "https://registry.npmjs.org/typestyle/-/typestyle-2.4.0.tgz"
+  "version" "2.4.0"
   dependencies:
     "csstype" "3.0.10"
     "free-style" "3.1.0"

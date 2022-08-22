@@ -5,6 +5,21 @@ import {
   IPreliminaryConfig
 } from './tokens';
 
+import {
+  checkBoxWithTextWrapperStyle,
+  descriptionStyle,
+  formNormalTextStyle,
+  formStyle,
+  generateButtonStyle,
+  libraryOptionStyle,
+  libraryOptionsWrapperStyle,
+  sectionHeaderStyle,
+  settingItemStyle,
+  templatifyStyle,
+  textInputStyle
+} from './style/FormStyle';
+import { classes } from 'typestyle';
+
 const idToCamalCase = (id: string) => {
   const idTokens = id.split('-');
   let camalCase = idTokens[0];
@@ -31,7 +46,7 @@ const rendererFactory =
   ) => {
     if (type === 'simple-checkbox') {
       return (
-        <div className="notebook-settings-item">
+        <div className={classes(formNormalTextStyle, settingItemStyle)}>
           <label>
             <input
               type="checkbox"
@@ -46,11 +61,11 @@ const rendererFactory =
       );
     } else if (type === 'import-liraries') {
       return (
-        <div className="notebook-settings-item">
+        <div className={classes(formNormalTextStyle, settingItemStyle)}>
           <div> {name} </div>
-          <div>
+          <span className={libraryOptionsWrapperStyle}>
             {LIBRARIES.map(library => (
-              <label key={library.id}>
+              <label key={library.id} className={libraryOptionStyle}>
                 <input
                   type="checkbox"
                   id={library.id}
@@ -61,12 +76,18 @@ const rendererFactory =
                 <span>{library.name}</span>
               </label>
             ))}
-          </div>
+          </span>
         </div>
       );
     } else if (type === 'scatter-plots') {
       return (
-        <div className="notebook-settings-item">
+        <div
+          className={classes(
+            formNormalTextStyle,
+            settingItemStyle,
+            checkBoxWithTextWrapperStyle
+          )}
+        >
           <label>
             <input
               type="checkbox"
@@ -77,7 +98,7 @@ const rendererFactory =
             />
             <span>{name}</span>
           </label>
-          <label>
+          <label className={textInputStyle}>
             <span> Y-var: </span>
             <input
               type="text"
@@ -90,7 +111,13 @@ const rendererFactory =
       );
     } else if (type === 'feature-to-feature-corr') {
       return (
-        <div className="notebook-settings-item">
+        <div
+          className={classes(
+            formNormalTextStyle,
+            settingItemStyle,
+            checkBoxWithTextWrapperStyle
+          )}
+        >
           <label key={id}>
             <input
               type="checkbox"
@@ -101,8 +128,8 @@ const rendererFactory =
             />
             {name}
           </label>
-          <label>
-            <span> Target Variable: </span>
+          <label className={textInputStyle}>
+            <span> Target variable: </span>
             <input
               type="text"
               id="target-var"
@@ -172,12 +199,16 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
     useState<IDescriptiveStatConfig>({});
   console.log(preliminaryConfig, descriptiveStatConfig, filePath);
   return (
-    <div className="templatify-body">
+    <div className={templatifyStyle}>
       <h1>Templatify</h1>
-      <p>Create a Jupyter notebook template!</p>
-      <form id="settingsForm">
+      <p className={descriptionStyle}>
+        The extension allows users to select a csv file and choose the types of
+        data analysis that they would like to perform. These analyses can range
+        from histograms, scatter plots, to correlation matrices.
+      </p>
+      <form className={formStyle}>
         <label>
-          Please select a csv file to proceed.
+          <div className={formNormalTextStyle}>Please select a csv file.</div>
           <input
             type="file"
             id="file"
@@ -185,8 +216,8 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             onChange={e => setFilePath(e.target.value)}
           />
         </label>
-        <h2>Preliminary Settings</h2>
-        <ul className="notebook-settings-list">
+        <div className={sectionHeaderStyle}>Preliminary Settings</div>
+        <div className="preliminary-settings-list">
           {PRELIMINARY_OPTIONS.map(({ name, id, renderer }) => {
             const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
               const fieldNameCamalCase = idToCamalCase(id);
@@ -221,9 +252,9 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             };
             return renderer(name, id, changeHandler);
           })}
-        </ul>
-        <h2>Types of Data Analysis</h2>
-        <ul className="data-settings-list">
+        </div>
+        <div className={sectionHeaderStyle}>Types of Data Analysis</div>
+        <div className="descriptive-stat-settings-list">
           {DESCRIPTIVE_STAT_OPTIONS.map(({ name, id, renderer }) => {
             const fieldNameCamalCase = idToCamalCase(id);
             const checkBoxChangeHandler = (
@@ -275,8 +306,9 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             }
             return renderer(name, id, ...handlers);
           })}
-        </ul>
+        </div>
         <button
+          className={generateButtonStyle}
           onClick={e => {
             e.preventDefault();
             handleClick({ filePath, preliminaryConfig, descriptiveStatConfig });

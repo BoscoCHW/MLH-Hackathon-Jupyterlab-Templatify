@@ -7,6 +7,18 @@ import nbformat as nbf
 import tornado
 
 HERE = Path(__file__).parent.resolve()
+PLACEHOLDER = 'STRING_PLACEHOLDER'
+
+
+def replace_placeholders(list_of_str: list[str], *replacements: str):
+    replacement_strings = list(replacements)
+    while len(replacement_strings) > 0:
+        for index, string in enumerate(list_of_str):
+            if PLACEHOLDER in string:
+                replaced_string = string.replace(
+                    PLACEHOLDER, replacement_strings.pop(0))
+                list_of_str[index] = replaced_string
+
 
 class RouteHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -16,18 +28,38 @@ class RouteHandler(APIHandler):
     def post(self):
         req_body = self.get_json_body()
         print(req_body)
+        filePath: str = req_body.get("filePath", None)
+        if filePath != None or filePath != "":
+            filename = filePath.split('\\')[-1]
+            del req_body['filePath']
+
         with (HERE / "code_blocks.json").open() as f:
             code_blocks = json.load(f)
-        
+
         cells = []
         for category, category_config in req_body.items():
-            if category == "filePath":
-                print(category_config)
-                continue
             for key, val in category_config.items():
+                blocks = code_blocks[category][key]
                 if val == True:
-                    cells.extend(code_blocks[category][key])
-            
+                    if key == 'importData':
+                        if filePath != None:
+                            replace_placeholders(blocks[1]['text'], filename)
+                else:
+                    if key == 'importLibraries':
+                        if 'all' not in val:
+                            import_lines = []
+                            for library in val:
+                                import_lines.extend(
+                                    list(filter(lambda string: library in string, blocks[1]['text'])))
+                            if 'pyplot' in val:
+                                import_lines.append("%matplotlib inline")
+                            blocks[1]['text'] = import_lines
+                    if key == 'scatterPlots' or key == 'featureToFeatureCorr':
+                        if val:
+                            replace_placeholders(blocks[1]['text'], val)
+
+                cells.extend(blocks)
+
         nb = nbf.v4.new_notebook()
 
         nb['cells'] = []

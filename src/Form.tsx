@@ -129,11 +129,11 @@ const rendererFactory =
             {name}
           </label>
           <label className={textInputStyle}>
-            <span> Target variable: </span>
+            <span> Drop variable: </span>
             <input
               type="text"
-              id="target-var"
-              name="target-var"
+              id="drop-var"
+              name="drop-var"
               onChange={changeHandlers[1]}
             />
           </label>
@@ -169,8 +169,8 @@ const PRELIMINARY_OPTIONS = [
 
 const DESCRIPTIVE_STAT_OPTIONS = [
   {
-    name: 'Histogram',
-    id: 'histogram',
+    name: 'Histograms',
+    id: 'histograms',
     renderer: rendererFactory('simple-checkbox')
   },
   {
@@ -213,6 +213,7 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
             type="file"
             id="file"
             name="file"
+            accept=".csv"
             onChange={e => setFilePath(e.target.value)}
           />
         </label>
@@ -279,9 +280,7 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
                     return {
                       ...prevState,
                       [fieldNameCamalCase]: (
-                        document.querySelector(
-                          '#target-var'
-                        ) as HTMLInputElement
+                        document.querySelector('#drop-var') as HTMLInputElement
                       ).value
                     };
                   } else {

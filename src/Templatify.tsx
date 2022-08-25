@@ -46,7 +46,7 @@ const openNotebook = async (
  */
 export class Templatify extends ReactWidget {
   app: JupyterFrontEnd;
-  browser: IFileBrowserFactory; // unused, can delete
+  browser: IFileBrowserFactory;
   constructor(app: JupyterFrontEnd, browser: IFileBrowserFactory) {
     super();
     this.app = app;

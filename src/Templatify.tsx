@@ -7,7 +7,12 @@ import React from 'react';
 import { FormComponent } from './Form';
 import { INotebookConfig } from './tokens';
 
-const addJupyterNotebook = async (body: INotebookConfig) => {
+/**
+ * Create a jupyter notebook in the current working directory.
+ * @param body The jupyter notebook configuration options.
+ * @returns The file path of the jupyter notebook.
+ */
+const addJupyterNotebook = async (body: INotebookConfig): Promise<string> => {
   const settings = ServerConnection.makeSettings({});
   const serverResponse = await ServerConnection.makeRequest(
     URLExt.join(settings.baseUrl, '/templatify/addNotebook'),
@@ -21,6 +26,11 @@ const addJupyterNotebook = async (body: INotebookConfig) => {
   return data.path;
 };
 
+/**
+ * Open a file in Jupyterlab.
+ * @param app The Jupyterlab frontend app.
+ * @param path The path of the file.
+ */
 const openNotebook = async (
   app: JupyterFrontEnd,
   path: string
@@ -31,6 +41,9 @@ const openNotebook = async (
   });
 };
 
+/**
+ * A wrapper class which renders the jupyter notebook generation form.
+ */
 export class Templatify extends ReactWidget {
   app: JupyterFrontEnd;
   browser: IFileBrowserFactory; // unused, can delete

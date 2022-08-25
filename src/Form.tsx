@@ -20,6 +20,11 @@ import {
 } from './style/FormStyle';
 import { classes } from 'typestyle';
 
+/**
+ * Change a string in the form of *-* to camal case.
+ * @param id the id of input fields
+ * @returns the same string in camal case.
+ */
 const idToCamalCase = (id: string) => {
   const idTokens = id.split('-');
   let camalCase = idTokens[0];
@@ -29,6 +34,9 @@ const idToCamalCase = (id: string) => {
   return camalCase;
 };
 
+/**
+ * Libraries available for importing in jupyter notebook.
+ */
 const LIBRARIES = [
   { name: 'all of below', id: 'all' },
   { name: 'numpy (as np)', id: 'numpy' },
@@ -37,6 +45,11 @@ const LIBRARIES = [
   { name: 'seaborn (as sns)', id: 'seaborn' }
 ];
 
+/**
+ * A factory to create renderer for input types.
+ * @param type the type of the renderer.
+ * @returns The renderer for an input field.
+ */
 const rendererFactory =
   (type: string) =>
   (
@@ -186,6 +199,10 @@ const DESCRIPTIVE_STAT_OPTIONS = [
 ];
 
 export interface IFormProps {
+  /**
+   * A callback to handle clicking of the submit button.
+   * @param notebookConfig Jupyter notebook configuration options.
+   */
   handleClick(notebookConfig: INotebookConfig): void;
 }
 
@@ -197,7 +214,6 @@ export const FormComponent: React.FunctionComponent<IFormProps> = ({
     useState<IPreliminaryConfig>({});
   const [descriptiveStatConfig, setDescriptiveStatConfig] =
     useState<IDescriptiveStatConfig>({});
-  console.log(preliminaryConfig, descriptiveStatConfig, filePath);
   return (
     <div className={templatifyStyle}>
       <h1>Templatify</h1>

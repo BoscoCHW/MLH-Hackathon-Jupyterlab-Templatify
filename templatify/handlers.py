@@ -11,6 +11,9 @@ PLACEHOLDER = 'STRING_PLACEHOLDER'
 
 
 def replace_placeholders(list_of_str: list[str], *replacements: str):
+    """Given a list of strings and an unspecified number of replacement strings,
+        replace 'STRING_PLACEHOLDER' in the list in order of the replacement strings given.
+    """
     replacement_strings = list(replacements)
     while len(replacement_strings) > 0:
         for index, string in enumerate(list_of_str):
@@ -26,8 +29,8 @@ class RouteHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def post(self):
+        """Handle POST request for the path /templatify/addNotebook"""
         req_body = self.get_json_body()
-        print(req_body)
         filePath: str = req_body.get("filePath", None)
         if filePath != None or filePath != "":
             filename = filePath.split('\\')[-1]
